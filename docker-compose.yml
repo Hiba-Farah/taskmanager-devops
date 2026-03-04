@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  task-service:
+    build: ./task-service
+    ports:
+      - "3001:3001"
+    networks:
+      - taskmanager-network
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "3002:3002"
+    networks:
+      - taskmanager-network
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      - TASK_SERVICE_URL=http://task-service:3001
+      - USER_SERVICE_URL=http://user-service:3002
+    depends_on:
+      - task-service
+      - user-service
+    networks:
+      - taskmanager-network
+
+networks:
+  taskmanager-network:
+    driver: bridge
